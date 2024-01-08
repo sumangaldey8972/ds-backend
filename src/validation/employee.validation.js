@@ -26,7 +26,6 @@ const edit_employee_validation = {
     employee_id: Joi.string().required(),
     name: Joi.string().required(),
     phone: Joi.string().min(10).max(15).required(),
-    email: Joi.string().email().required(),
     designation: Joi.string().required(),
     salary: Joi.number().required(),
   }),
