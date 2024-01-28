@@ -4,6 +4,7 @@ const get_employee_validation = {
   query: Joi.object().keys({
     page: Joi.number().integer().optional(),
     limit: Joi.number().integer().optional(),
+    search: Joi.string().optional().allow(""),
   }),
 };
 
@@ -31,10 +32,17 @@ const edit_employee_validation = {
   }),
 };
 
+const delete_employee_validation = {
+  query: Joi.object().keys({
+    employee_id: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   get_employee_validation,
   create_employee_validation,
   edit_employee_validation,
+  delete_employee_validation,
 };
 
 // employee_id: { type: String },

@@ -2,14 +2,23 @@ const employeeModels = require("../models/employee.models");
 const mongo = require("mongodb");
 const objectId = mongo.ObjectId;
 
-const get_employee_query = async (page, limit) => {
+const get_employee_query = async (page, limit, search) => {
   try {
     const options = {
       page: page,
       limit: limit,
     };
+    const query = [];
+    query.push({
+      $match: {
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+    });
 
-    const aggregateDetails = employeeModels.aggregate([]);
+    const aggregateDetails = employeeModels.aggregate(query);
     const details = await employeeModels.aggregatePaginate(
       aggregateDetails,
       options,
@@ -102,8 +111,45 @@ const edit_employee_query = async (employee_id, details) => {
   }
 };
 
+const delete_employee_query = async (emplpoyee_id) => {
+  try {
+    let existing_employee = await employeeModels.findOne({
+      _id: new objectId(emplpoyee_id),
+    });
+
+    if (existing_employee) {
+      const deleted_employee = await employeeModels.deleteOne({
+        _id: emplpoyee_id,
+      });
+
+      if (deleted_employee) {
+        return Promise.resolve({
+          status: true,
+          status_code: 200,
+          message: "Employee Delete successfully!",
+        });
+      } else {
+        return Promise.reject({
+          status: false,
+          status_code: 500,
+          message: "Internal server error!",
+        });
+      }
+    } else {
+      return Promise.reject({
+        status: false,
+        status_code: 409,
+        message: "Employee details not found",
+      });
+    }
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
 module.exports = {
   create_employee_query,
   edit_employee_query,
   get_employee_query,
+  delete_employee_query,
 };
